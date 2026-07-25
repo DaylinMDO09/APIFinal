@@ -40,5 +40,28 @@ namespace APITours.Controllers
             await _context.SaveChangesAsync();
             return Ok(pais);
         }
+        [HttpPut("ActualizarPais/{id}")]
+        public async Task<IActionResult> ActualizarPais(int id, [FromBody] PaisModel pais)
+        {
+            if (id != pais.IdPais)
+            {
+                return BadRequest();
+            }
+            _context.Entry(pais).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpDelete("EliminarPais/{id}")]
+        public async Task<IActionResult> EliminarPais(int id)
+        {
+            var pais = await _context.Pais.FindAsync(id);
+            if (pais == null)
+            {
+                return NotFound();
+            }
+            _context.Pais.Remove(pais);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }
