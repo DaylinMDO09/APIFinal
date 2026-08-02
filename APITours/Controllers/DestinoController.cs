@@ -21,6 +21,10 @@ namespace APITours.Controllers
         public async Task<ActionResult> ObtenerDestinos()
         {
             var destinos = await _context.Destino.ToListAsync();
+            if (destinos.Count == 0)
+            {
+                return BadRequest(new { mensaje = "No se encuentran destinos en la base de datos." }); 
+            }
             return Ok(destinos);
         }
         [HttpGet("ObtenerDestino/{id}")]
@@ -57,9 +61,27 @@ namespace APITours.Controllers
             {
                 return BadRequest(new { mensaje = "El país especificado no existe" });
             }
-            _context.Entry(destino).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            try { 
+                _context.Entry(destino).State = EntityState.Modified;            
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DestinoBD(id))
+                {
+                    return NotFound(new { mensaje = "Destino no encontrado" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
             return NoContent();
+        }
+
+        private bool DestinoBD(int id)
+        {
+            return _context.Destino.Any(e => e.IdDestino == id);
         }
         [HttpDelete("EliminarDestino/{id}")]
         public async Task<IActionResult> EliminarDestino(int id)

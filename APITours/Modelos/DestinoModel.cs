@@ -10,7 +10,7 @@ namespace APITours.Modelos
         public int IdDestino { get; set; }
         [Required]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre del destino debe tener entre 3 y 100 caracteres.")]
-        public string NombreDestino { get; set; } = null!;
+        public string Nombre { get; set; } = null!;
         [ForeignKey("Pais")]
         public int IdPais { get; set; }
     }
