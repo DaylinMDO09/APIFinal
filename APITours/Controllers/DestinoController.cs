@@ -27,8 +27,8 @@ namespace APITours.Controllers
             }
             return Ok(destinos);
         }
-        [HttpGet("ObtenerDestino/{id}")]
-        public async Task<IActionResult> ObtenerDestino(int id)
+        [HttpGet("ObtenerDestinos/{id}")]
+        public async Task<IActionResult> ObtenerDestinoPorId(int id)
         {
             var destino = await _context.Destino.FindAsync(id);
             if (destino == null)

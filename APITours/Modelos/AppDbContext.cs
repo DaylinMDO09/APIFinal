@@ -10,5 +10,6 @@ namespace APITours.Modelos
         public DbSet<UsuariosModel> Usuarios { get; set; }
         public DbSet<PaisModel> Pais { get; set; }
         public DbSet<DestinoModel> Destino { get; set; }
+        public DbSet<CategoriaModel> Categoria { get; set; }
     }
 }
