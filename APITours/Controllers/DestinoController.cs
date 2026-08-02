@@ -36,6 +36,11 @@ namespace APITours.Controllers
         [HttpPost("AgregarDestino")]
         public async Task<IActionResult> AgregarDestino([FromBody] DestinoModel destino)
         {
+            var pais = await _context.Pais.FindAsync(destino.IdPais);
+            if (pais == null)
+            {
+                return BadRequest(new { mensaje = "El país especificado no existe" });
+            }
             _context.Destino.Add(destino);
             await _context.SaveChangesAsync();
             return Ok(destino);
@@ -46,6 +51,11 @@ namespace APITours.Controllers
             if (id != destino.IdDestino)
             {
                 return BadRequest(new { mensaje = "El ID del destino no coincide" });
+            }
+            var pais = await _context.Pais.FindAsync(destino.IdPais);
+            if (pais == null)
+            {
+                return BadRequest(new { mensaje = "El país especificado no existe" });
             }
             _context.Entry(destino).State = EntityState.Modified;
             await _context.SaveChangesAsync();
