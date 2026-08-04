@@ -15,5 +15,7 @@ namespace APITours.Modelos
         public DbSet<TransporteModel> Transporte { get; set; }
         public DbSet<ClientesModel> Clientes { get; set; }
         public DbSet<MetodoPagoModel> MetodoPago { get; set; }
+        public DbSet<ToursModel> Tours { get; set; }
+        public DbSet<ReservasModel> Reservas { get; set; }
     }
 }

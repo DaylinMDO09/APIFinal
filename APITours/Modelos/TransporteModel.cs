@@ -11,7 +11,7 @@ namespace APITours.Modelos
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El tipo de transporte debe tener entre 3 y 100 caracteres.")]
         public string TipoTransporte { get; set; } = null!;
         [Required]
-        [Range(1, 50, ErrorMessage = "La capacidad de transporte debe ser entre 1 y 50.")]
+        [Range(1, 100, ErrorMessage = "La capacidad de transporte debe ser entre 1 y 100.")]
         [Column("CAPACIDAD")]
         public int CapacidadTransporte { get; set; }
     }
