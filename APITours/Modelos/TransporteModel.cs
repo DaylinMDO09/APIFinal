@@ -12,6 +12,7 @@ namespace APITours.Modelos
         public string TipoTransporte { get; set; } = null!;
         [Required]
         [Range(1, 50, ErrorMessage = "La capacidad de transporte debe ser entre 1 y 50.")]
+        [Column("CAPACIDAD")]
         public int CapacidadTransporte { get; set; }
     }
 }
