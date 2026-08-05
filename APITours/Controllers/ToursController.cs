@@ -219,11 +219,27 @@ namespace APITours.Controllers
                     throw;
                 }
             }
-            return Ok(tour);
+            return NoContent();
         }
-        public bool TourExists(int id)
+        private bool TourExists(int id)
         {
             return _context.Tours.Any(e => e.IdTour == id);
+        }
+        [HttpDelete("EliminarTour/{id}")]
+        public async Task<ActionResult> EliminarTour(int id)
+        {
+            var tour = await _context.Tours.FindAsync(id);
+            if (tour == null)
+            {
+                return NotFound(new { Mensaje = "Tour no encontrado" });
+            }
+            if (tour.EstadoTour == "Tour En Curso" || tour.EstadoTour == "Tour Finalizado")
+            {
+                return BadRequest(new { Mensaje = "No es posible eliminar este tour" });
+            }
+            _context.Tours.Remove(tour);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
