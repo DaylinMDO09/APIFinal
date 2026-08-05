@@ -19,6 +19,15 @@ namespace APITours.Controllers
         public async Task<ActionResult> ObtenerReservas()
         {
             var reservas = await _context.Reservas.Include(r => r.Tour)
+                                                  .ThenInclude(t => t!.Pais)
+                                                  .Include(r => r.Tour)
+                                                  .ThenInclude(t => t!.Destino)
+                                                  .Include(r => r.Tour)
+                                                  .ThenInclude(t => t!.Categoria)
+                                                  .Include(r => r.Tour)
+                                                  .ThenInclude(t => t!.GuiaTuristico)
+                                                  .Include(r => r.Tour)
+                                                  .ThenInclude(t => t!.Transporte)
                                                   .Include(r => r.Cliente)
                                                   .Include(r => r.MetodoPago)
                                                   .ToListAsync();
@@ -63,6 +72,15 @@ namespace APITours.Controllers
         public async Task<ActionResult> ObtenerReservaPorId(int id)
         {
             var reserva = await _context.Reservas.Include(r => r.Tour)
+                                                 .ThenInclude(t => t!.Pais)
+                                                 .Include(r => r.Tour)
+                                                 .ThenInclude(t => t!.Destino)
+                                                 .Include(r => r.Tour)
+                                                 .ThenInclude(t => t!.Categoria)
+                                                 .Include(r => r.Tour)
+                                                 .ThenInclude(t => t!.GuiaTuristico)
+                                                 .Include(r => r.Tour)
+                                                 .ThenInclude(t => t!.Transporte)
                                                  .Include(r => r.Cliente)
                                                  .Include(r => r.MetodoPago)
                                                  .FirstOrDefaultAsync(r => r.IdReserva == id);
@@ -122,7 +140,7 @@ namespace APITours.Controllers
                 return BadRequest($"No se encontró ningún tour con el ID {reserva.idTour}.");
             }
             var estadoTour = await _context.Tours.Where(t => t.IdTour == reserva.idTour).Select(t => t.EstadoTour).FirstOrDefaultAsync();
-            if (estadoTour != "Tour En Curso" || estadoTour != "Tour Finalizado")
+            if (estadoTour == "Tour En Curso" || estadoTour == "Tour Finalizado")
             {
                 return BadRequest($"El tour con el ID {reserva.idTour} no está disponible para reservas.");
             }
@@ -137,6 +155,77 @@ namespace APITours.Controllers
             _context.Reservas.Add(reserva);
             await _context.SaveChangesAsync();
             return Ok(reserva);
+        }
+        [HttpPut("ActualizarReserva/{id}")]
+        public async Task<ActionResult> ActualizarReserva(int id, [FromBody] ReservasModel reserva)
+        {
+            var reservaExistente = await _context.Reservas.FindAsync(id);
+            if (reservaExistente == null)
+            {
+                return NotFound($"No se encontró ninguna reserva con el ID {id}.");
+            }
+            
+            DateTime fechaReserva = new DateTime(reserva.FechaReserva.Year, reserva.FechaReserva.Month, reserva.FechaReserva.Day);
+            if (fechaReserva < DateTime.Today || fechaReserva > DateTime.Today)
+            {
+                return BadRequest("La fecha de la reserva no puede ser anterior ni posterior a la fecha actual.");
+            }
+            var clienteExistente = await _context.Clientes.AnyAsync(c => c.IdCliente == reserva.idCliente);
+            if (!clienteExistente)
+            {
+                return BadRequest($"No se encontró ningún cliente con el ID {reserva.idCliente}.");
+            }
+            var TourExistente = await _context.Tours.AnyAsync(t => t.IdTour == reserva.idTour);
+            if (!TourExistente)
+            {
+                return BadRequest($"No se encontró ningún tour con el ID {reserva.idTour}.");
+            }
+            var estadoTour = await _context.Tours.Where(t => t.IdTour == reserva.idTour).Select(t => t.EstadoTour).FirstOrDefaultAsync();
+            if (estadoTour != "Tour En Curso" && estadoTour != "Tour Finalizado")
+            {
+                return BadRequest($"El tour con el ID {reserva.idTour} no está disponible para reservas.");
+            }
+            var MetodoPagoExistente = await _context.MetodoPago.AnyAsync(m => m.IdMetodoPago == reserva.idMetodoPago);
+            if (!MetodoPagoExistente)
+            {
+                return BadRequest($"No se encontró ningún método de pago con el ID {reserva.idMetodoPago}.");
+            }
+            _context.Entry(reserva).State = EntityState.Modified;
+            try { 
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ReservaExists(id))
+                {
+                    return NotFound($"No se encontró ninguna reserva con el ID {id}.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+        private bool ReservaExists(int id)
+        {
+            return _context.Reservas.Any(e => e.IdReserva == id);
+        }
+        [HttpDelete("EliminarReserva/{id}")]
+        public async Task<ActionResult> EliminarReserva(int id)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null)
+            {
+                return NotFound($"No se encontró ninguna reserva con el ID {id}.");
+            }
+            if(reserva.Tour!.EstadoTour == "Tour En Curso" || reserva.Tour.EstadoTour == "Tour Finalizado")
+            {
+                return BadRequest($"No se puede eliminar la reserva con el ID {id} porque el tour asociado está en curso o finalizado.");
+            }
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

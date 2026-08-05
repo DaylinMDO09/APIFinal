@@ -237,6 +237,11 @@ namespace APITours.Controllers
             {
                 return BadRequest(new { Mensaje = "No es posible eliminar este tour" });
             }
+            var reservasExistentes = await _context.Reservas.AnyAsync(r => r.idTour == id);
+            if (reservasExistentes)
+            {
+                return BadRequest(new { Mensaje = "No es posible eliminar el tour porque tiene reservas asociadas." });
+            }
             _context.Tours.Remove(tour);
             await _context.SaveChangesAsync();
             return NoContent();
