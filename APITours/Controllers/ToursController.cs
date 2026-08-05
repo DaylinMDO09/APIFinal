@@ -40,11 +40,11 @@ namespace APITours.Controllers
                 t.DuracionTour,
                 t.FechaHoraFin,
                 t.EstadoTour,
-                t.Pais.NombrePais,
-                t.Destino.NombreDestino,
-                t.Categoria.NombreCategoria,
-                t.GuiaTuristico.NombreGuiaTuristico,
-                t.Transporte.TipoTransporte
+                t.Pais!.NombrePais,
+                t.Destino!.NombreDestino,
+                t.Categoria!.NombreCategoria,
+                t.GuiaTuristico!.NombreGuiaTuristico,
+                t.Transporte!.TipoTransporte
             });
 
             return Ok(resultadotours);
@@ -75,11 +75,11 @@ namespace APITours.Controllers
                 t.DuracionTour,
                 t.FechaHoraFin,
                 t.EstadoTour,
-                t.Pais.NombrePais,
-                t.Destino.NombreDestino,
-                t.Categoria.NombreCategoria,
-                t.GuiaTuristico.NombreGuiaTuristico,
-                t.Transporte.TipoTransporte
+                t.Pais!.NombrePais,
+                t.Destino!.NombreDestino,
+                t.Categoria!.NombreCategoria,
+                t.GuiaTuristico!.NombreGuiaTuristico,
+                t.Transporte!.TipoTransporte
             });
 
             return Ok(resultadotours);
