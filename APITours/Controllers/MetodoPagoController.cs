@@ -79,6 +79,11 @@ namespace APITours.Controllers
             {
                 return NotFound(new { mensaje = "Método de pago no encontrado" });
             }
+            var reservaExistente = await _context.Reservas.AnyAsync(r => r.idMetodoPago == id);
+            if (reservaExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar el método de pago porque está asociado a una reserva." });
+            }
             _context.MetodoPago.Remove(metodoPago);
             await _context.SaveChangesAsync();
             return NoContent();

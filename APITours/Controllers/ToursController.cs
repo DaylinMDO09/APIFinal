@@ -197,7 +197,7 @@ namespace APITours.Controllers
             }
 
             var tourExistente = await _context.Tours.FindAsync(id);
-            if (tourExistente.EstadoTour == "Tour En Curso" || tourExistente.EstadoTour == "Tour Finalizado")
+            if (tourExistente!.EstadoTour == "Tour En Curso" || tourExistente.EstadoTour == "Tour Finalizado")
             {
                 return BadRequest(new { Mensaje = "No es posible modificar los datos de este tour" });
             }

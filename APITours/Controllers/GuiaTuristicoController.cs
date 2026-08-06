@@ -84,6 +84,11 @@ namespace APITours.Controllers
             {
                 return NotFound(new { mensaje = "Guía turístico no encontrado" });
             }
+            var tourExistente = await _context.Tours.AnyAsync(t => t.idGuiaTuristico == id);
+            if (tourExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar el guía turístico porque está asociado a un tour." });
+            }
             _context.GuiaTuristico.Remove(guia);
             await _context.SaveChangesAsync();
             return NoContent();

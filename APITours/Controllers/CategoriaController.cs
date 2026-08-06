@@ -81,6 +81,11 @@ namespace APITours.Controllers
             {
                 return NotFound(new { mensaje = "Categoría no encontrada" });
             }
+            var tourExistente = await _context.Tours.AnyAsync(t => t.idCategoria == id);
+            if (tourExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar la categoría porque está asociada a un tour." });
+            }
             _context.Categoria.Remove(categoria);
             await _context.SaveChangesAsync();
             return NoContent();

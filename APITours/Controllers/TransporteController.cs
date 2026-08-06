@@ -78,6 +78,11 @@ namespace APITours.Controllers
             {
                 return NotFound(new { mensaje = "Transporte no encontrado" });
             }
+            var tourExistente = await _context.Tours.AnyAsync(t => t.idPais == id);
+            if (tourExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar el transporte porque está asociado a un tour." });
+            }
             _context.Transporte.Remove(transporte);
             await _context.SaveChangesAsync();
             return NoContent();

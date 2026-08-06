@@ -93,6 +93,11 @@ namespace APITours.Controllers
             {
                 return NotFound(new { mensaje = "Cliente no encontrado" });
             }
+            var reservaExistente = await _context.Reservas.AnyAsync(r => r.idCliente == id);
+            if (reservaExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar el cliente porque está asociado a una reserva." });
+            }
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
             return NoContent();
