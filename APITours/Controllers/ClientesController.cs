@@ -79,7 +79,7 @@ namespace APITours.Controllers
                     throw;
                 }
             }
-            return Ok(cliente);
+            return NoContent();
         }
         private bool ClienteExists(int id)
         {

@@ -155,15 +155,16 @@ namespace APITours.Controllers
             DateTime fechainicioTour = tour.FechaTour.ToDateTime(tour.HoraTour);
             DateTime fechafinalTour = fechainicioTour.AddHours(tour.DuracionTour);
 
-            var tourRepetido = _context.Tours.AsEnumerable().Any(
-                t => {
-                    DateTime fechaInicioExistente = t.FechaTour.ToDateTime(t.HoraTour);
-                    DateTime fechaFinExistente = fechaInicioExistente.AddHours(t.DuracionTour);
-                    return (fechainicioTour < fechaFinExistente && fechafinalTour > fechaInicioExistente);
-                });
+            var tours = await _context.Tours.ToListAsync();
+
+            var tourRepetido = tours.Any(t =>
+                t.IdTour != id &&
+                fechainicioTour < t.FechaTour.ToDateTime(t.HoraTour).AddHours(t.DuracionTour) &&
+                fechafinalTour > t.FechaTour.ToDateTime(t.HoraTour));
+
             if (tourRepetido)
             {
-                return BadRequest(new { Mensaje = "Ya existe un tour programado en esas fechas. Puede programa otro tour para otra fecha." });
+                return BadRequest(new { Mensaje = "Ya existe otro tour programado en esas fechas. Puede programar otro tour para otra fecha." });
             }
             var pais = await _context.Pais.AnyAsync(p => p.IdPais == tour.idPais);
             if (!pais)
@@ -197,12 +198,26 @@ namespace APITours.Controllers
             }
 
             var tourExistente = await _context.Tours.FindAsync(id);
-            if (tourExistente!.EstadoTour == "Tour En Curso" || tourExistente.EstadoTour == "Tour Finalizado")
+            if (tourExistente == null)
+            {
+                return NotFound(new { Mensaje = "Tour no encontrado" });
+            }
+
+            if (tourExistente.EstadoTour == "Tour En Curso" || tourExistente.EstadoTour == "Tour Finalizado")
             {
                 return BadRequest(new { Mensaje = "No es posible modificar los datos de este tour" });
             }
 
-            _context.Entry(tour).State = EntityState.Modified;
+            tourExistente.NombreTour = tour.NombreTour;
+            tourExistente.FechaTour = tour.FechaTour;
+            tourExistente.HoraTour = tour.HoraTour;
+            tourExistente.PrecioTour = tour.PrecioTour;
+            tourExistente.DuracionTour = tour.DuracionTour;
+            tourExistente.idPais = tour.idPais;
+            tourExistente.idDestino = tour.idDestino;
+            tourExistente.idCategoria = tour.idCategoria;
+            tourExistente.idGuiaTuristico = tour.idGuiaTuristico;
+            tourExistente.idTransporte = tour.idTransporte;
 
             try
             {

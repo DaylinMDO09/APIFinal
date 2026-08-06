@@ -59,6 +59,11 @@ namespace APITours.Controllers
             {
                 return NotFound();
             }
+            var destinoExistente = await _context.Destino.AnyAsync(d => d.IdPais == id);
+            if (destinoExistente)
+            {
+                return BadRequest(new { mensaje = "No se puede eliminar el país porque está asociado a un destino." });
+            }
             var tourExistente = await _context.Tours.AnyAsync(t => t.idPais == id);
             if (tourExistente)
             {
